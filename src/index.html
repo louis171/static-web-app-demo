@@ -1,17 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Flow+Block&family=IBM+Plex+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <title>This is the most important game you will ever play</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Vanilla JavaScript App</title>
-</head>
+  <body>
+    <main>
+      <div class="wrapper glitch"></div>
+    </main>
+  </body>
+  <script>
+    let globalId = 0;
+    function buildString(selector, str) {
+      let wrapper = document.querySelector(".wrapper");
+      str.split(" ").forEach((word) => {
+        let p = document.createElement("p");
+        let div = document.createElement("div");
+        let width = getTextWidth(word, "60pt IBM Plex Sans");
+        //console.log(word + " " + width);
+        div.style.width = width + "px";
+        div.style.height = 120 + "px";
+        //div.style.background = "#fff"
+        wrapper.appendChild(div);
 
-<body>
-  <main>
-    <h1>Vanilla JavaScript App</h1>
-  </main>
-</body>
+        let divSpace = document.createElement("div");
+        divSpace.style.width = "20px";
+        divSpace.style.height = "1px";
+        wrapper.appendChild(divSpace);
 
+        p.id = globalId;
+        p.innerText = word;
+        globalId++;
+        div.appendChild(p);
+      });
+    }
+
+    function glitch() {
+      let wrapper = document.querySelector(".wrapper");
+      let childCount = globalId - 1;
+      let rng = getRandomInt(0, childCount);
+      let p = document.getElementById(rng);
+      let rand = Math.random() < 0.5;
+      if (rand) {
+        p.style.fontFamily = "IBM Plex Sans";
+      } else {
+        p.style.fontFamily = "Flow Block";
+      }
+    }
+
+    function getTextWidth(text, font) {
+      // if given, use cached canvas for better performance
+      // else, create new canvas
+      var canvas =
+        getTextWidth.canvas ||
+        (getTextWidth.canvas = document.createElement("canvas"));
+      var context = canvas.getContext("2d");
+      context.font = font;
+      var metrics = context.measureText(text);
+      return metrics.width;
+    }
+
+    function background() {
+      let body = document.querySelector("body");
+      let divHeight = 50;
+      let divWidth = 90;
+      let numVert = Math.ceil(reportWindowSize().height / divHeight);
+      let numHori = Math.ceil(reportWindowSize().width / divWidth);
+      let yPos = 0;
+      let coordsArr = getCoords();
+
+      coordsArr.forEach((coord) => {
+        let div = document.createElement("div");
+        div.style.position = "absolute";
+
+        div.style.top = coord.yPos + "px";
+        div.style.left = coord.xPos + "px";
+        div.style.height = divHeight + "px";
+        div.style.width = divWidth + "px";
+        //div.style.background = "#fff";
+        div.style.zIndex = -999;
+        body.appendChild(div);
+        let p = document.createElement("p");
+        p.style.position = "absolute";
+        p.style.color = "#203e8605";
+        p.style.fontSize = getRandomFloat(1, 5) + "em";
+        p.style.userSelect = "none";
+        p.innerText = "LIFE";
+        div.appendChild(p);
+      });
+    }
+
+    function getCoords() {
+      let divHeight = 50;
+      let divWidth = 90;
+      console.log(reportWindowSize().height / divHeight);
+      console.log(reportWindowSize().width / divWidth);
+      let numVert = Math.ceil(reportWindowSize().height / divHeight);
+      let numHori = Math.ceil(reportWindowSize().width / divWidth);
+      let yPos = 0;
+      let xPos = 0;
+
+      let xPosArr = [];
+      for (let index = 0; index < numHori; index++) {
+        xPosArr.push(xPos);
+        xPos += divWidth;
+      }
+
+      let yPosArr = [];
+      for (let index = 0; index < numVert; index++) {
+        yPosArr.push(yPos);
+        yPos += divHeight;
+      }
+
+      let coordsArr = [];
+      yPosArr.forEach((pos) => {
+        xPosArr.forEach((xPos) => {
+          coordsArr.push({ yPos: pos, xPos: xPos });
+        });
+      });
+      //console.log(coordsArr.length);
+      return coordsArr;
+    }
+
+    window.addEventListener("resize", reportWindowSize);
+
+    function reportWindowSize() {
+      return {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    }
+
+    function getRandomFloat(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.random() * (max - min + 1) + min;
+    }
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    buildString(
+      ".wrapper",
+      "This is the most important game you will ever play"
+    );
+
+    setInterval(() => {
+      glitch();
+    }, getRandomInt(0, 1000));
+
+    background();
+  </script>
 </html>
